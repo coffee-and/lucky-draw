@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# Lucky Draw
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+고객 대상 터치형 추첨 이벤트 시스템입니다.  
+고객은 이름과 휴대폰 번호를 입력한 뒤 룰렛형 또는 선물상자형 추첨에 참여할 수 있고, 관리자는 어드민 화면에서 이벤트 설정과 참여 내역을 관리할 수 있습니다.
 
-Currently, two official plugins are available:
+## 주요 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 고객 화면
 
-## React Compiler
+- 룰렛형 추첨 UI
+- 선물상자형 추첨 UI
+- 이름 / 휴대폰 번호 입력
+- 개인정보 수집 및 이벤트 참여 동의
+- 휴대폰 번호 기준 중복 참여 방지
+- 최대 참여 인원 초과 시 참여 제한
+- 당첨 결과 모달 표시
+- 등수별 경품 색상 표시
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 관리자 화면
 
-## Expanding the ESLint configuration
+- 최대 참여 인원 설정
+- 추첨 방식 설정
+  - 룰렛형
+  - 선물상자형
+- 경품명 및 총 수량 수정
+- 경품 현황 확인
+- 최근 당첨자 확인
+- 참여 내역 조회
+- 휴대폰 번호 마스킹 처리
+- CSV 다운로드
+- 참여 내역 초기화
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 기술 스택
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React
+- TypeScript
+- Vite
+- CSS
+- LocalStorage
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 프로젝트 구조
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src
+├─ components
+│  ├─ CountdownOverlay
+│  ├─ GiftDraw
+│  ├─ ResultModal
+│  └─ RouletteDraw
+├─ data
+├─ pages
+│  ├─ AdminPage
+│  └─ CustomerPage
+├─ types
+└─ utils
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 실행 방법
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+## 빌드
+
+```bash
+npm run build
+```
+
+## 구현 포인트
+
+- 룰렛은 결과를 먼저 계산한 뒤 해당 칸이 화살표 위치에 멈추도록 회전합니다.
+- 경품 수량과 최대 참여 인원을 기준으로 룰렛 칸 비율을 계산합니다.
+- 휴대폰 번호를 기준으로 중복 참여를 방지합니다.
+- 관리자는 이벤트 설정, 경품 정보, 참여 내역을 한 화면에서 확인할 수 있습니다.
+
+## 개선 가능 사항
+
+- Firebase / Supabase 연동
+- 관리자 로그인 기능
+- 이벤트 기간 설정
+- 경품 이미지 등록
+- 당첨자 검색 및 필터링
+
+## 프로젝트 목적
+
+오프라인 이벤트나 프로모션 현장에서 사용할 수 있는 웹 기반 추첨 시스템을 구현한 사이드 프로젝트입니다.  
+고객 참여 화면과 관리자 화면을 분리해 실제 운영 흐름을 고려했습니다.
