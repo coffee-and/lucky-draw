@@ -1,6 +1,7 @@
 .admin-page {
   min-height: 100vh;
-  padding: var(--space-6);
+  padding: var(--space-5);
+  color: var(--color-text-soft);
 }
 
 .admin-header {
@@ -8,7 +9,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .admin-header p,
@@ -23,7 +24,7 @@
 
 .admin-header h1 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
   letter-spacing: -0.06em;
 }
 
@@ -38,9 +39,10 @@
 .settings-modal button {
   border: none;
   border-radius: var(--radius-full);
-  padding: 12px 18px;
+  padding: 10px 15px;
   background: var(--color-primary-soft);
   color: var(--color-primary-dark);
+  font-size: 0.88rem;
   font-weight: 800;
   cursor: pointer;
   transition:
@@ -65,8 +67,8 @@
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
 }
 
 .admin-stats article,
@@ -74,26 +76,29 @@
 .admin-table-card,
 .winner-card,
 .prize-card {
-  padding: var(--space-5);
+  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 24px 70px var(--color-shadow);
+  box-shadow: 0 20px 54px rgba(168, 112, 28, 0.1);
 }
 
 .admin-stats span {
   display: block;
   margin-bottom: var(--space-3);
   color: var(--color-text-soft);
+  font-size: 1rem;
   font-weight: 800;
 }
 
 .admin-stats strong {
-  font-size: 2.4rem;
+  color: var(--color-text);
+  font-size: 1.7rem;
+  line-height: 1;
 }
 
 .event-summary-card {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .event-summary-card h2,
@@ -102,12 +107,15 @@
 .admin-table-card__header h2,
 .settings-modal__header h2 {
   margin: 0 0 var(--space-2);
+  color: var(--color-text);
+  font-size: 1.32rem;
+  letter-spacing: -0.04em;
 }
 
 .event-summary-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-3);
   margin-top: var(--space-4);
 }
 
@@ -116,6 +124,7 @@
   border-radius: var(--radius-full);
   background: var(--color-primary-soft);
   color: var(--color-primary-dark);
+  font-size: 0.95rem;
   font-weight: 900;
 }
 
@@ -123,7 +132,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .winner-card__header,
@@ -131,9 +140,14 @@
   margin-bottom: var(--space-4);
 }
 
-.admin-table-card__header p {
+.admin-table-card__header p,
+.winner-card p,
+.prize-item p {
   margin: 0;
   color: var(--color-text-soft);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.6;
 }
 
 .winner-list,
@@ -149,21 +163,25 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(241, 223, 184, 0.8);
+  background: transparent;
 }
 
-.winner-item p,
-.prize-item p {
-  margin: 4px 0 0;
-  color: var(--color-text-soft);
+.winner-item:last-child,
+.prize-item:last-child {
+  border-bottom: none;
 }
 
+.admin-stats span,
+.event-summary-list span,
+.winner-item strong,
+.prize-item strong,
 .winner-item span,
 .prize-item span {
-  font-weight: 900;
   color: var(--color-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 .admin-table-wrap {
@@ -179,13 +197,16 @@
 .admin-table-wrap td {
   padding: 14px 12px;
   border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
   text-align: left;
   white-space: nowrap;
 }
 
 .admin-table-wrap th {
   color: var(--color-primary-dark);
-  font-size: 0.85rem;
+  font-weight: 900;
 }
 
 .settings-modal {
@@ -200,10 +221,10 @@
 }
 
 .settings-modal__card {
-  width: min(96vw, 860px);
-  max-height: 90vh;
+  width: min(90vw, 640px);
+  max-height: 88vh;
   overflow-y: auto;
-  padding: var(--space-6);
+  padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
@@ -220,24 +241,27 @@
 
 .settings-modal__actions {
   justify-content: flex-end;
-  margin-top: var(--space-5);
+  margin-top: var(--space-4);
 }
 
 .settings-field {
   display: grid;
   gap: var(--space-2);
-  margin: var(--space-5) 0;
+  margin: var(--space-4) 0;
   color: var(--color-text-soft);
+  font-size: 0.95rem;
   font-weight: 800;
 }
+
 .settings-field input,
 .settings-reward-table input {
   width: 100%;
   border: 1px solid #e4cda8;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: #fffaf1;
   color: var(--color-text);
-  padding: 10px 12px;
+  padding: 9px 12px;
+  font-size: 0.95rem;
   font-weight: 800;
   outline: none;
 }
@@ -247,6 +271,32 @@
   border-color: var(--color-primary);
   background: #ffffff;
   box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.draw-mode-options {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: nowrap;
+}
+
+.draw-mode-options label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.draw-mode-options input {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  accent-color: var(--color-primary);
 }
 
 .settings-reward-table-wrap {
@@ -260,33 +310,42 @@
 
 .settings-reward-table th,
 .settings-reward-table td {
-  padding: 12px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+  font-weight: 800;
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
 }
 
 .settings-reward-table th {
-  color: var(--color-primary-dark);
-  font-size: 0.85rem;
-  font-weight: 900;
+  color: var(--color-text-soft);
 }
 
+.settings-reward-table th:first-child,
 .settings-reward-table td:first-child {
-  width: 70px;
+  width: 58px;
   font-weight: 900;
 }
 
+.settings-reward-table th:nth-child(2),
 .settings-reward-table td:nth-child(2) {
-  text-align: left;
+  width: 300px;
 }
 
+.settings-reward-table th:last-child,
 .settings-reward-table td:last-child {
-  width: 120px;
+  width: 82px;
+}
+
+.settings-reward-table td:nth-child(2) input {
+  max-width: 280px;
 }
 
 .settings-reward-table td:last-child input {
+  max-width: 64px;
   text-align: center;
 }
 
@@ -307,10 +366,6 @@
 
   .admin-page {
     padding: var(--space-5);
-  }
-
-  .settings-reward-item {
-    grid-template-columns: 1fr;
   }
 
   .settings-modal__actions {

@@ -1,0 +1,74 @@
+.gift-draw {
+  width: min(100%, 460px);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.gift-draw__button {
+  width: clamp(380px, 36vw, 520px);
+  height: clamp(380px, 36vw, 520px);
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: transform 0.16s ease;
+}
+
+.gift-draw__button:hover {
+  transform: translateY(-4px) scale(1.03);
+  animation: gift-shake 0.42s ease-in-out infinite;
+}
+
+.gift-draw__button:active {
+  transform: scale(0.96);
+}
+
+.gift-draw__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.gift-draw__button.is-shaking {
+  animation: gift-shake 0.42s ease-in-out infinite;
+}
+
+.gift-draw__icon {
+  font-size: clamp(15rem, 20vw, 18rem);
+  line-height: 1;
+  filter: drop-shadow(0 18px 22px rgba(105, 75, 32, 0.2));
+}
+
+.gift-draw p {
+  margin: -48px 0 0;
+  color: var(--color-text-soft);
+  font-weight: 800;
+}
+
+@keyframes gift-shake {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  20% {
+    transform: rotate(-7deg) scale(1.04);
+  }
+
+  40% {
+    transform: rotate(7deg) scale(1.04);
+  }
+
+  60% {
+    transform: rotate(-5deg) scale(1.03);
+  }
+
+  80% {
+    transform: rotate(5deg) scale(1.03);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}

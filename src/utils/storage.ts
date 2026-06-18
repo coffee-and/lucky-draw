@@ -6,6 +6,11 @@ const PARTICIPANTS_KEY = "lucky-draw-participants";
 const REWARDS_KEY = "lucky-draw-rewards";
 const EVENT_SETTINGS_KEY = "lucky-draw-event-settings";
 
+const DEFAULT_EVENT_SETTINGS: EventSettings = {
+  maxParticipants: 100,
+  drawMode: "roulette",
+};
+
 export const loadParticipants = (): Participant[] => {
   const data = localStorage.getItem(PARTICIPANTS_KEY);
 
@@ -41,18 +46,19 @@ export const saveRewards = (rewards: Reward[]) => {
 export const loadEventSettings = (): EventSettings => {
   const data = localStorage.getItem(EVENT_SETTINGS_KEY);
 
-  if (!data) {
-    return {
-      maxParticipants: 100,
-    };
-  }
+  if (!data) return DEFAULT_EVENT_SETTINGS;
 
   try {
-    return JSON.parse(data) as EventSettings;
-  } catch {
+    const parsedSettings = JSON.parse(data) as Partial<EventSettings>;
+
     return {
-      maxParticipants: 100,
+      maxParticipants:
+        parsedSettings.maxParticipants ??
+        DEFAULT_EVENT_SETTINGS.maxParticipants,
+      drawMode: parsedSettings.drawMode ?? DEFAULT_EVENT_SETTINGS.drawMode,
     };
+  } catch {
+    return DEFAULT_EVENT_SETTINGS;
   }
 };
 

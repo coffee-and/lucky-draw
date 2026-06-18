@@ -1,26 +1,45 @@
 import type { DrawResult, Reward } from "../types/reward";
 
-const LOSE_PROBABILITY = 40;
+export const drawReward = (
+  rewards: Reward[],
+  maxParticipants: number,
+  currentParticipantCount: number,
+): DrawResult => {
+  const remainingParticipantCount = Math.max(
+    maxParticipants - currentParticipantCount,
+    0,
+  );
 
-export const drawReward = (rewards: Reward[]): DrawResult => {
   const availableRewards = rewards.filter(
     (reward) => reward.remainingCount > 0,
   );
 
+  const remainingRewardCount = availableRewards.reduce(
+    (sum, reward) => sum + reward.remainingCount,
+    0,
+  );
+
+  const loseCount = Math.max(
+    remainingParticipantCount - remainingRewardCount,
+    0,
+  );
+
   const drawPool = [
     ...availableRewards.flatMap((reward) =>
-      Array.from({ length: reward.probability }, () => reward),
+      Array.from({ length: reward.remainingCount }, () => reward),
     ),
-    ...Array.from({ length: LOSE_PROBABILITY }, () => null),
+    ...Array.from({ length: loseCount }, () => null),
   ];
+
+  if (drawPool.length === 0) {
+    return { type: "lose" };
+  }
 
   const randomIndex = Math.floor(Math.random() * drawPool.length);
   const selected = drawPool[randomIndex];
 
   if (!selected) {
-    return {
-      type: "lose",
-    };
+    return { type: "lose" };
   }
 
   return {

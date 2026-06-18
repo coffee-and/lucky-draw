@@ -29,14 +29,16 @@ const AdminPage = () => {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [eventSettings, setEventSettings] = useState<EventSettings>({
     maxParticipants: 100,
+    drawMode: "roulette",
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const [draftSettings, setDraftSettings] = useState<EventSettings>({
     maxParticipants: 100,
+    drawMode: "roulette",
   });
   const [draftRewards, setDraftRewards] = useState<Reward[]>([]);
-
   useEffect(() => {
     const loadedParticipants = loadParticipants();
     const loadedRewards = loadRewards(initialRewards);
@@ -338,11 +340,47 @@ const AdminPage = () => {
                 value={draftSettings.maxParticipants}
                 onChange={(event) =>
                   setDraftSettings({
+                    ...draftSettings,
                     maxParticipants: Math.max(Number(event.target.value), 1),
                   })
                 }
               />
             </label>
+
+            <div className="settings-field">
+              추첨 방식
+              <div className="draw-mode-options">
+                <label>
+                  <input
+                    type="radio"
+                    name="drawMode"
+                    checked={draftSettings.drawMode === "roulette"}
+                    onChange={() =>
+                      setDraftSettings({
+                        ...draftSettings,
+                        drawMode: "roulette",
+                      })
+                    }
+                  />
+                  룰렛
+                </label>
+
+                <label>
+                  <input
+                    type="radio"
+                    name="drawMode"
+                    checked={draftSettings.drawMode === "cards"}
+                    onChange={() =>
+                      setDraftSettings({
+                        ...draftSettings,
+                        drawMode: "cards",
+                      })
+                    }
+                  />
+                  카드
+                </label>
+              </div>
+            </div>
 
             <div className="settings-reward-table-wrap">
               <table className="settings-reward-table">
