@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import CountdownOverlay from "../../components/CountdownOverlay/CountdownOverlay";
 import ResultModal from "../../components/ResultModal/ResultModal";
 import { initialRewards } from "../../data/rewards";
+import type { EventSettings } from "../../types/eventSettings";
 import type { Participant } from "../../types/participant";
 import type { DrawResult, Reward } from "../../types/reward";
 import { drawReward } from "../../utils/drawReward";
 import {
+  loadEventSettings,
   loadParticipants,
-  saveParticipants,
   loadRewards,
+  saveParticipants,
   saveRewards,
 } from "../../utils/storage";
 import "./CustomerPage.css";
@@ -25,6 +27,9 @@ const CustomerPage = () => {
   const [rewards, setRewards] = useState<Reward[]>(() =>
     loadRewards(initialRewards),
   );
+  const [eventSettings, setEventSettings] = useState<EventSettings>({
+    maxParticipants: 100,
+  });
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -35,6 +40,7 @@ const CustomerPage = () => {
 
   useEffect(() => {
     setParticipants(loadParticipants());
+    setEventSettings(loadEventSettings());
   }, []);
 
   useEffect(() => {
@@ -54,6 +60,11 @@ const CustomerPage = () => {
   const handleDraw = () => {
     const trimmedName = name.trim();
     const normalizedPhone = normalizePhone(phone);
+
+    if (participants.length >= eventSettings.maxParticipants) {
+      setMessage("이벤트 참여 가능 인원이 마감되었습니다.");
+      return;
+    }
 
     if (!trimmedName || !normalizedPhone) {
       setMessage("이름과 휴대폰 번호를 입력해주세요.");

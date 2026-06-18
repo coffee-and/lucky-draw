@@ -1,21 +1,50 @@
 import { useEffect, useState } from "react";
 import { initialRewards } from "../../data/rewards";
+import type { EventSettings } from "../../types/eventSettings";
 import type { Participant } from "../../types/participant";
 import type { Reward } from "../../types/reward";
-import { loadParticipants, loadRewards } from "../../utils/storage";
+import {
+  loadEventSettings,
+  loadParticipants,
+  loadRewards,
+  saveEventSettings,
+  saveParticipants,
+  saveRewards,
+} from "../../utils/storage";
 import "./AdminPage.css";
 
 const maskPhone = (phone: string) => {
   return phone.replace(/(\d{3})(\d{4})(\d{4})/, "$1****$3");
 };
 
+const resetRewardsToTotalCount = (rewards: Reward[]) => {
+  return rewards.map((reward) => ({
+    ...reward,
+    remainingCount: reward.totalCount,
+  }));
+};
+
 const AdminPage = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [eventSettings, setEventSettings] = useState<EventSettings>({
+    maxParticipants: 100,
+  });
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [draftSettings, setDraftSettings] = useState<EventSettings>({
+    maxParticipants: 100,
+  });
+  const [draftRewards, setDraftRewards] = useState<Reward[]>([]);
 
   useEffect(() => {
-    setParticipants(loadParticipants());
-    setRewards(loadRewards(initialRewards));
+    const loadedParticipants = loadParticipants();
+    const loadedRewards = loadRewards(initialRewards);
+    const loadedEventSettings = loadEventSettings();
+
+    setParticipants(loadedParticipants);
+    setRewards(loadedRewards);
+    setEventSettings(loadedEventSettings);
   }, []);
 
   const winners = participants.filter(
@@ -35,11 +64,133 @@ const AdminPage = () => {
       ? 0
       : ((winners.length / participants.length) * 100).toFixed(1);
 
+  const remainingParticipantCount = Math.max(
+    eventSettings.maxParticipants - participants.length,
+    0,
+  );
+
+  const handleOpenSettings = () => {
+    setDraftSettings(eventSettings);
+    setDraftRewards(rewards);
+    setIsSettingsOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    setIsSettingsOpen(false);
+  };
+
+  const handleDraftRewardChange = (
+    rewardId: number,
+    field: "name" | "totalCount",
+    value: string,
+  ) => {
+    setDraftRewards((prevRewards) =>
+      prevRewards.map((reward) => {
+        if (reward.id !== rewardId) return reward;
+
+        if (field === "name") {
+          return {
+            ...reward,
+            name: value,
+          };
+        }
+
+        return {
+          ...reward,
+          totalCount: Math.max(Number(value), 0),
+        };
+      }),
+    );
+  };
+
+  const handleSaveSettings = () => {
+    const normalizedRewards = resetRewardsToTotalCount(draftRewards);
+
+    setEventSettings(draftSettings);
+    setRewards(normalizedRewards);
+
+    saveEventSettings(draftSettings);
+    saveRewards(normalizedRewards);
+
+    setIsSettingsOpen(false);
+  };
+
+  const handleResetParticipants = () => {
+    const confirmed = window.confirm(
+      "참여 내역만 초기화하시겠습니까? 이벤트 설정과 경품 설정은 유지됩니다.",
+    );
+
+    if (!confirmed) return;
+
+    const resetRewards = resetRewardsToTotalCount(rewards);
+
+    setParticipants([]);
+    setRewards(resetRewards);
+
+    saveParticipants([]);
+    saveRewards(resetRewards);
+  };
+
+  const handleExportCsv = () => {
+    const header = ["이름", "휴대폰번호", "결과", "경품", "참여시간"];
+
+    const rows = sortedParticipants.map((participant) => [
+      participant.name,
+      participant.phone,
+      participant.resultType === "win" ? "당첨" : "꽝",
+      participant.rewardName ?? "-",
+      new Date(participant.createdAt).toLocaleString("ko-KR"),
+    ]);
+
+    const csv = [header, ...rows].map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob(["\ufeff" + csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "lucky-draw-participants.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <p>Admin Dashboard</p>
-        <h1>럭키드로우 운영 현황</h1>
+        <div>
+          <p>Admin Dashboard</p>
+          <h1>럭키드로우 운영 현황</h1>
+        </div>
+
+        <div className="admin-header__actions">
+          <button
+            type="button"
+            className="admin-settings-button"
+            onClick={handleOpenSettings}
+          >
+            설정 변경
+          </button>
+
+          <button
+            type="button"
+            className="admin-export-button"
+            onClick={handleExportCsv}
+          >
+            CSV 다운로드
+          </button>
+
+          <button
+            type="button"
+            className="admin-reset-button"
+            onClick={handleResetParticipants}
+          >
+            참여내역 초기화
+          </button>
+        </div>
       </header>
 
       <section className="admin-stats">
@@ -47,18 +198,31 @@ const AdminPage = () => {
           <span>총 참여자</span>
           <strong>{participants.length}</strong>
         </article>
+
         <article>
           <span>총 당첨자</span>
           <strong>{winners.length}</strong>
         </article>
+
         <article>
           <span>꽝 참여자</span>
           <strong>{losers.length}</strong>
         </article>
+
         <article>
           <span>당첨률</span>
           <strong>{winRate}%</strong>
         </article>
+      </section>
+
+      <section className="event-summary-card">
+        <h2>이벤트 설정</h2>
+
+        <div className="event-summary-list">
+          <span>최대 참여 인원 {eventSettings.maxParticipants}명</span>
+          <span>현재 참여자 {participants.length}명</span>
+          <span>남은 참여 가능 인원 {remainingParticipantCount}명</span>
+        </div>
       </section>
 
       <section className="admin-grid">
@@ -78,6 +242,7 @@ const AdminPage = () => {
                     <strong>{winner.name}</strong>
                     <p>{winner.rewardRank}등</p>
                   </div>
+
                   <span>{winner.rewardName}</span>
                 </article>
               ))}
@@ -92,8 +257,11 @@ const AdminPage = () => {
           <div className="prize-list">
             {rewards.map((reward) => (
               <div key={reward.id} className="prize-item">
-                <strong>{reward.rank}등</strong>
-                <p>{reward.name}</p>
+                <div>
+                  <strong>{reward.rank}등</strong>
+                  <p>{reward.name}</p>
+                </div>
+
                 <span>
                   {reward.remainingCount} / {reward.totalCount}
                 </span>
@@ -147,6 +315,96 @@ const AdminPage = () => {
           </table>
         </div>
       </section>
+
+      {isSettingsOpen && (
+        <div className="settings-modal">
+          <section className="settings-modal__card">
+            <div className="settings-modal__header">
+              <div>
+                <p>Event Settings</p>
+                <h2>설정 변경</h2>
+              </div>
+
+              <button type="button" onClick={handleCloseSettings}>
+                닫기
+              </button>
+            </div>
+
+            <label className="settings-field">
+              최대 참여 인원
+              <input
+                type="number"
+                min="1"
+                value={draftSettings.maxParticipants}
+                onChange={(event) =>
+                  setDraftSettings({
+                    maxParticipants: Math.max(Number(event.target.value), 1),
+                  })
+                }
+              />
+            </label>
+
+            <div className="settings-reward-table-wrap">
+              <table className="settings-reward-table">
+                <thead>
+                  <tr>
+                    <th>등수</th>
+                    <th>경품명</th>
+                    <th>총 수량</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {draftRewards.map((reward) => (
+                    <tr key={reward.id}>
+                      <td>{reward.rank}등</td>
+
+                      <td>
+                        <input
+                          type="text"
+                          value={reward.name}
+                          onChange={(event) =>
+                            handleDraftRewardChange(
+                              reward.id,
+                              "name",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          value={reward.totalCount}
+                          onChange={(event) =>
+                            handleDraftRewardChange(
+                              reward.id,
+                              "totalCount",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="settings-modal__actions">
+              <button type="button" onClick={handleCloseSettings}>
+                취소
+              </button>
+
+              <button type="button" onClick={handleSaveSettings}>
+                저장
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 };
