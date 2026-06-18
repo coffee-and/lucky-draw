@@ -1,7 +1,10 @@
+import AdminPage from "./pages/AdminPage/AdminPage";
 import CustomerPage from "./pages/CustomerPage/CustomerPage";
 
 function App() {
-  return <CustomerPage />;
+  const isAdminPage = window.location.pathname === "/admin";
+
+  return isAdminPage ? <AdminPage /> : <CustomerPage />;
 }
 
 export default App;

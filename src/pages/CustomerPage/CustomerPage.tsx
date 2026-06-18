@@ -5,7 +5,12 @@ import { initialRewards } from "../../data/rewards";
 import type { Participant } from "../../types/participant";
 import type { DrawResult, Reward } from "../../types/reward";
 import { drawReward } from "../../utils/drawReward";
-import { loadParticipants, saveParticipants } from "../../utils/storage";
+import {
+  loadParticipants,
+  saveParticipants,
+  loadRewards,
+  saveRewards,
+} from "../../utils/storage";
 import "./CustomerPage.css";
 
 const normalizePhone = (phone: string) => {
@@ -17,7 +22,9 @@ const isValidKoreanPhone = (phone: string) => {
 };
 
 const CustomerPage = () => {
-  const [rewards, setRewards] = useState<Reward[]>(initialRewards);
+  const [rewards, setRewards] = useState<Reward[]>(() =>
+    loadRewards(initialRewards),
+  );
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -33,6 +40,10 @@ const CustomerPage = () => {
   useEffect(() => {
     saveParticipants(participants);
   }, [participants]);
+
+  useEffect(() => {
+    saveRewards(rewards);
+  }, [rewards]);
 
   const resetForm = () => {
     setName("");
