@@ -24,6 +24,34 @@ const resetRewardsToTotalCount = (rewards: Reward[]) => {
   }));
 };
 
+const preserveRewardRemainingCounts = (
+  draftRewards: Reward[],
+  currentRewards: Reward[],
+) => {
+  return draftRewards.map((draftReward) => {
+    const currentReward = currentRewards.find(
+      (reward) => reward.id === draftReward.id,
+    );
+
+    if (!currentReward) {
+      return {
+        ...draftReward,
+        remainingCount: draftReward.totalCount,
+      };
+    }
+
+    const usedCount = Math.max(
+      currentReward.totalCount - currentReward.remainingCount,
+      0,
+    );
+
+    return {
+      ...draftReward,
+      remainingCount: Math.max(draftReward.totalCount - usedCount, 0),
+    };
+  });
+};
+
 const AdminPage = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -106,7 +134,10 @@ const AdminPage = () => {
   };
 
   const handleSaveSettings = () => {
-    const normalizedRewards = resetRewardsToTotalCount(draftRewards);
+    const normalizedRewards = preserveRewardRemainingCounts(
+      draftRewards,
+      rewards,
+    );
 
     setEventSettings(draftSettings);
     setRewards(normalizedRewards);
